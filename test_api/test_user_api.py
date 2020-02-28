@@ -9,7 +9,7 @@ base_url = f'http://{HOST}:{PORT}'
 
 data = {
     'phone': '18526081087',
-    'token': 'aa7dcc99349626f524b4e7676493ef87'
+    # 'token': 'aa7dcc99349626f524b4e7676493ef87'
 }
 
 class TestUserApi(TestCase):

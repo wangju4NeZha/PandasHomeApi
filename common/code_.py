@@ -15,7 +15,7 @@ def send_code(phone):
     #2.保存code到缓存 -redis
     cache_.save_code(phone,code)
     #3.发送短信
-    client = AcsClient('LTAIRiQGIywYBeYN', 'ZOHiNBYPr72dCFog2fLU5Pu9RvVAIf', 'cn-hangzhou')
+    client = AcsClient('LTAI4FqbMxbMPrnKSBsu5KSh', 'copeGy6ElAJ0fdleAkYxcOME5TR4CJ', 'cn-hangzhou')
 
     request = CommonRequest()
     request.set_accept_format('json')
@@ -27,11 +27,12 @@ def send_code(phone):
 
     request.add_query_param('RegionId', "cn-hangzhou")
     request.add_query_param('PhoneNumbers', phone)
-    request.add_query_param('SignName', "Disen工作室")  # 签名： 途中旅游 或 Disen工作室
-    request.add_query_param('TemplateCode', "SMS_128646125")
+    request.add_query_param('SignName', "熊猫之家")
+    request.add_query_param('TemplateCode', "SMS_184210172")
     request.add_query_param('TemplateParam', '{"code":"%s"}' % code)
 
     response = client.do_action_with_exception(request)
+    # python2:  print(response)
     print(str(response, encoding='utf-8'))
 
 def valid_code(phone,code):
