@@ -8,10 +8,10 @@ engine.connect()
 Session = sessionmaker(bind=engine)
 session = Session()
 
-db_conn = pymysql.Connection(host='localhost',
+db_conn = pymysql.Connection(host='114.116.245.220',
                         port=3306,
                         user='root',
                         password='123456',
-                        db='pandas',
+                        db='homems',
                         charset='utf8',
                         cursorclass=pymysql.cursors.DictCursor)

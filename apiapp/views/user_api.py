@@ -5,7 +5,7 @@ from sqlalchemy import or_
 from apiapp.views import validate_json, validate_params
 from common import code_, token_, cache_
 from db import session
-from apiapp.models import TUser
+from db.models import TUser
 
 blue = Blueprint('user_api',__name__)
 

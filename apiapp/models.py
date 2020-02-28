@@ -52,9 +52,9 @@ class TComment(Base):
     comment_id = Column(Integer, primary_key=True)
     user_id = Column(ForeignKey('t_user.user_id'), index=True)
     house_id = Column(ForeignKey('t_house.house_id'), index=True)
-    comment_time = Column(DateTime)
+    create_time = Column(DateTime)
     content = Column(Text)
-    grade = Column(Integer)
+    state = Column(Integer)
 
     house = relationship('THouse', primaryjoin='TComment.house_id == THouse.house_id', backref='t_comments')
     user = relationship('TUser', primaryjoin='TComment.user_id == TUser.user_id', backref='t_comments')
@@ -70,6 +70,7 @@ class TComplaint(Base):
     phone = Column(Integer)
     email = Column(String(30))
     content = Column(Text)
+    state = Column(Integer)
 
     order = relationship('TOrder', primaryjoin='TComplaint.order_id == TOrder.order_id', backref='t_complaints')
     user = relationship('TUser', primaryjoin='TComplaint.user_id == TUser.user_id', backref='t_complaints')
@@ -122,17 +123,26 @@ class THouse(Base):
 
 
 
+class THouseVerify(Base):
+    __tablename__ = 't_house_verify'
+
+    verify_id = Column(Integer, primary_key=True)
+    house_id = Column(ForeignKey('t_house.house_id'), index=True)
+    verify_status = Column(Integer)
+    remarks = Column(Text)
+
+    house = relationship('THouse', primaryjoin='THouseVerify.house_id == THouse.house_id', backref='t_house_verifies')
+
+
+
 class TLuckyTicket(Base):
     __tablename__ = 't_lucky_ticket'
 
     lucky_ticket_id = Column(Integer, primary_key=True)
-    u_lucky_ticketid = Column(ForeignKey('t_u_lucky_ticket.u_lucky_ticketid'), index=True)
     money = Column(Integer)
     begin_time = Column(Date)
     end_time = Column(Date)
-    image = Column(String(20))
-
-    t_u_lucky_ticket = relationship('TULuckyTicket', primaryjoin='TLuckyTicket.u_lucky_ticketid == TULuckyTicket.u_lucky_ticketid', backref='t_lucky_tickets')
+    image = Column(String(200))
 
 
 
@@ -175,6 +185,18 @@ class TPanda(Base):
 
 
 
+class TPublicNotice(Base):
+    __tablename__ = 't_public_notice'
+
+    public_notice_id = Column(Integer, primary_key=True)
+    content = Column(String)
+    public_title = Column(String(50))
+    public_time = Column(DateTime)
+    public_remarks = Column(Text)
+    public_status = Column(Integer)
+
+
+
 class TScore(Base):
     __tablename__ = 't_score'
 
@@ -210,12 +232,9 @@ class TSysMenu(Base):
     __tablename__ = 't_sys_menu'
 
     menu_id = Column(Integer, primary_key=True)
-    parent_id = Column(ForeignKey('t_sys_menu.menu_id'), index=True)
     menu_name = Column(String(20))
     ord = Column(Integer)
     url = Column(String(50))
-
-    parent = relationship('TSysMenu', remote_side=[menu_id], primaryjoin='TSysMenu.parent_id == TSysMenu.menu_id', backref='t_sys_menus')
 
 
 
@@ -231,12 +250,8 @@ class TSysRole(Base):
 class TSysRoleMenu(Base):
     __tablename__ = 't_sys_role_menu'
 
+    role_id = Column(Integer)
     sys_menu_id = Column(Integer, primary_key=True)
-    role_id = Column(ForeignKey('t_sys_role.role_id'), index=True)
-    menu_id = Column(ForeignKey('t_sys_menu.menu_id'), index=True)
-
-    menu = relationship('TSysMenu', primaryjoin='TSysRoleMenu.menu_id == TSysMenu.menu_id', backref='t_sys_role_menus')
-    role = relationship('TSysRole', primaryjoin='TSysRoleMenu.role_id == TSysRole.role_id', backref='t_sys_role_menus')
 
 
 
@@ -244,12 +259,12 @@ class TSysUser(Base):
     __tablename__ = 't_sys_user'
 
     user_id = Column(Integer, primary_key=True)
-    role_id = Column(ForeignKey('t_sys_role.role_id'), index=True)
     username = Column(String(20))
+    role_id = Column(Integer)
     password = Column(String(32))
     nick_name = Column(String(20))
-
-    role = relationship('TSysRole', primaryjoin='TSysUser.role_id == TSysRole.role_id', backref='t_sys_users')
+    head = Column(String(300))
+    email = Column(String(30))
 
 
 
@@ -272,7 +287,9 @@ class TULuckyTicket(Base):
 
     u_lucky_ticketid = Column(Integer, primary_key=True)
     user_id = Column(ForeignKey('t_user.user_id'), index=True)
+    lucky_ticket_id = Column(ForeignKey('t_lucky_ticket.lucky_ticket_id'), index=True)
 
+    lucky_ticket = relationship('TLuckyTicket', primaryjoin='TULuckyTicket.lucky_ticket_id == TLuckyTicket.lucky_ticket_id', backref='tu_lucky_tickets')
     user = relationship('TUser', primaryjoin='TULuckyTicket.user_id == TUser.user_id', backref='tu_lucky_tickets')
 
 
