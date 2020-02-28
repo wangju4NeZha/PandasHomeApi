@@ -3,7 +3,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 # yyserver1是在 {C:/windows/System32/drivers}/etc/hosts中配置域名
-engine = create_engine('mysql+pymysql://root:123456@localhost:3306/pandas')
+engine = create_engine('mysql+pymysql://root:123456@114.116.245.220:3306/homems')
 engine.connect()
 Session = sessionmaker(bind=engine)
 session = Session()
