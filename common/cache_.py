@@ -5,7 +5,7 @@ def save_code(phone,code):
 
 
 def get_code(phone):
-    rd.get(phone)
+    return rd.get(phone)
 
 
 def add_token(token, user_id):
@@ -14,3 +14,15 @@ def add_token(token, user_id):
 def get_user_id(token):
     # API接口操作时，需要通过接口中token参数获取登录的用户信息
     return rd.get(token)
+
+def del_token(token):
+    #退出登陆删除缓存中的token
+    rd.delete(token)
+
+# ------用户头像的缓存-----
+def save_head_url(key, url):
+    rd.set(key, url, ex=3600 * 7 * 24)
+
+
+def get_head_url(key):
+    return rd.get(key)

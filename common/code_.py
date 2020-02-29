@@ -39,4 +39,6 @@ def valid_code(phone,code):
     #1.从缓存中读取code(发送的code)
     code_cache = cache_.get_code(phone)
     #2.判断缓存中code和用户输入的code是否一致
+    print(phone,code_cache,code)
     return code_cache == code
+

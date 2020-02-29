@@ -1,10 +1,13 @@
-from flask import Blueprint
+import os
+
+from flask import Blueprint, Response
 from flask import request,jsonify
 from sqlalchemy import or_
 
+import settings
 from apiapp.models import TUser
 from apiapp.views import validate_json, validate_params
-from common import code_, token_, cache_
+from common import code_, token_, cache_, oss_
 from db import session
 # from db.models import TUser
 
@@ -85,13 +88,23 @@ def login():
     if user:
         token = token_.gen_token(user.user_id)
         cache_.add_token(token, user.user_id)
-        return jsonify({
+
+        head_url = ''
+        if user.img:
+            head_url = cache_.get_head_url(user.img)
+            if not head_url:
+                head_url = oss_.get_oss_img_url(user.img)
+
+                cache_.save_head_url(user.img, head_url)
+        resp:Response =  jsonify({
             'state': 0,
             'msg': '登录成功',
             'token': token
         })
-
-
+        # 设置响应对象的cookie，向客户端响应cookie
+        resp.set_cookie('token', token)
+        resp.set_cookie('head', head_url)
+        return resp
 
     return jsonify({
         'state': 4,
@@ -142,7 +155,14 @@ def modify_password():
 
 @blue.route('/login_out/')
 def login_out():
-    pass
+    token = request.cookies.get('token')
+    cache_.del_token(token)
+
+    return jsonify({
+        'state':0,
+        'msg':'退出登陆成功'
+    })
+
 
 @blue.route('/upload_head/',methods=["POST"])
 def upload_head():
@@ -153,9 +173,47 @@ def upload_head():
     user_id = cache_.get_user_id(token)
     file_name = upload_file.filename
 
+    save_file_path = os.path.join(settings.TEMP_DIR, file_name)
+    # 保存上传的文件到临时的目录中
+    upload_file.save(save_file_path)
+
+    # 将临时的文件上传到oss服务器中， 并获取到缩小后的图片URL
+    head_url = oss_.upload_head(user_id, file_name, save_file_path)
+
+    # 将head_url保存到用户的表中
+    user = session.query(TUser).get(user_id)
+    user.img = f'{user_id}-{file_name}'  # 存储oss上的key对象
+    session.add(user)
+    session.commit()
+
+    # 将头像的URL 存到 redis中
+    cache_.save_head_url(user.img, head_url)
+
+    # 删除临时的文件
+    os.remove(save_file_path)
+
     return jsonify({
         'state':0,
-        'msg':'上传成功'
+        'msg':'上传成功',
+        'head':head_url
+    })
+
+@blue.route('/head/', methods=["GET"])
+def get_head():
+    token = request.cookies.get('token')  # 1. 从请求参数中获取  2. 从请求头的Cookie中获取
+
+    user_id = cache_.get_user_id(token)
+
+    user = session.query(TUser).get(user_id)
+
+    head_url = cache_.get_head_url(user.img)
+    if not head_url:
+        head_url = oss_.get_oss_img_url(user.img)
+        cache_.save_head_url(user.img, head_url)
+
+    return jsonify({
+        'state': 0,
+        'head': head_url
     })
 
 

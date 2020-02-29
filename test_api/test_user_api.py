@@ -9,7 +9,7 @@ base_url = f'http://{HOST}:{PORT}'
 
 data = {
     'phone': '18526081087',
-    # 'token': 'aa7dcc99349626f524b4e7676493ef87'
+    'token': '48beea6f295b2d535ba6d660be053e1b'
 }
 
 class TestUserApi(TestCase):
@@ -23,7 +23,7 @@ class TestUserApi(TestCase):
         resp = requests.post(url, json={
             'name': 'xiangshu',
             'phone': data['phone'],
-            'code': '3408',
+            'code': '649730',
             'password': '123456'  # 密文要求（前端）：需要使用hash算法
         })
         print(resp.json())
@@ -32,7 +32,7 @@ class TestUserApi(TestCase):
         url = base_url + '/api/login/'
         resp = requests.post(url,json={
             'phone':data['phone'],
-            'password':'123456'
+            'password':'123458'
         })
         resp_data = resp.json()
         print(resp_data)
@@ -48,3 +48,17 @@ class TestUserApi(TestCase):
         })
         resp_data = resp.json()
         print(resp_data)
+
+    def test_e_upload_head(self):
+        url = base_url+"/api/upload_head/"
+        resp = requests.post(url, files={
+            'head': ('tiger.jpg', open('tiger.jpg', 'rb'), 'image/jpeg')
+        }, cookies={'token': data['token']})
+
+        print(resp.json())
+
+    def test_f_login_out(self):
+        url = base_url+"/api/login_out/"
+        resp = requests.get(url,cookies={'token':data['token']})
+
+        print(resp.json())
